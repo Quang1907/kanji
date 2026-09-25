@@ -1,0 +1,27 @@
+{
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "concurrently": "^9.2.4",
+    "tsx": "^4.23.13",
+    "vite": "^6.4.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "mysql2": "^3.24.4",
+    "prisma": "^6.19.3",
+    "promise": "^8.3.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"tsx watch backend/src/server.ts\"",
+    "build": "tsc -b && vite build",
+    "db:migrate": "tsx database/schema.ts migrate",
+    "db:reset": "tsx database/schema.ts reset",
+    "db:create": "node scripts/migration.cjs create",
+    "db:update": "node scripts/migration.cjs update",
+    "db:delete": "node scripts/migration.cjs delete",
+    "seed:create": "node scripts/seed.cjs create",
+    "seed:update": "node scripts/seed.cjs update",
+    "seed:delete": "node scripts/seed.cjs delete"
+  }
+}
