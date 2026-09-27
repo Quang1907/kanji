@@ -1,52 +1,36 @@
-import { normalizeApiError } from "./apiError";
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:5995/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-interface RequestOptions extends Omit<RequestInit, "body"> {
-  body?: unknown;
-}
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
-export async function apiClient<T>(
-  endpoint: string,
-  options: RequestOptions = {},
-): Promise<T> {
-  const { body, headers, ...rest } = options;
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // If unauthorized and has expired/invalid token, remove it
+      if (localStorage.getItem("accessToken")) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        window.dispatchEvent(new Event("auth:logout"));
+      }
+    }
+    return Promise.reject(error);
+  },
+);
 
-  let response: Response;
-
-  try {
-    response = await fetch(`${API_URL}${endpoint}`, {
-      ...rest,
-      headers: {
-        "Content-Type": "application/json",
-        ...headers,
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-  } catch (error) {
-    throw await normalizeApiError(error);
-  }
-
-  if (!response.ok) {
-    const normalized = await normalizeApiError(response);
-
-    throw normalized;
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
-}
-
-// Sửa normalizeApiError để không mất lỗi đã chuẩn hóa
-// Thêm vào đầu hàm:
-
-// if (
-//   isRecord(error) &&
-//   typeof error.message === "string" &&
-//   "fieldErrors" in error
-// ) {
-//   return error as NormalizedApiError;
-// }
+export default apiClient;

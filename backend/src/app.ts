@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
 
+import authRoutes from "./routes/auth.routes";
 import kanjiRoutes from "./routes/kanji.routes";
 import vocabularyRoutes from "./routes/vocabulary.routes";
 import grammarRoutes from "./routes/grammar.routes";
 import lessonRoutes from "./routes/lesson.routes";
+import learningRoutes from "./routes/learning.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
@@ -23,6 +25,8 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
+app.use("/api/auth", authRoutes);
+app.use("/api/learning", learningRoutes);
 app.use("/api/kanji", kanjiRoutes);
 app.use("/api/vocabulary", vocabularyRoutes);
 app.use("/api/grammar", grammarRoutes);

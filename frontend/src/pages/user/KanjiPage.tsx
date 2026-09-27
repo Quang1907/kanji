@@ -1,46 +1,40 @@
-import { useKanji } from "../../hooks/use-kanji";
+import { useEffect, useState } from "react";
+import { kanjiService } from "@/services/kanji.service";
+import type { LocalKanji } from "@/models/kanji.local.model";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 export default function KanjiPage() {
-  const kanji = useKanji();
+  const [kanji, setKanji] = useState<LocalKanji[]>([]);
+  const isOnline = useOnlineStatus();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadKanji() {
+      try {
+        const data = await kanjiService.getAll();
+        setKanji(data);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadKanji();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
-      <h1>Kanji</h1>
-
-      <div>Tổng số: {kanji.length}</div>
-
-      <div>
-        {kanji.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              border: "1px solid #ddd",
-
-              padding: 16,
-
-              marginBottom: 8,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 48,
-              }}
-            >
-              {item.kanji_character}
-            </div>
-
-            <div>Hán Việt: {item.han_viet}</div>
-
-            <div>Nghĩa: {item.meaning}</div>
-
-            <div>Onyomi: {item.onyomi}</div>
-
-            <div>Kunyomi: {item.kunyomi}</div>
-
-            <div>Số nét: {item.strokes}</div>
-          </div>
-        ))}
-      </div>
+      <div>{isOnline ? "🟢 Online" : "🔴 Offline"}</div>
+      {kanji.map((item) => (
+        <div key={item.id}>
+          <strong>{item.kanji_character}</strong>
+          <div>{item.meaning}</div>
+          <div>Onyomi: {item.onyomi}</div>
+          <div>Kunyomi: {item.kunyomi}</div>
+        </div>
+      ))}
     </div>
   );
 }

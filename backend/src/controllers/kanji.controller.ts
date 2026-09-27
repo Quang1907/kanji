@@ -94,12 +94,22 @@ export class KanjiController {
       const updatedSince = req.query.updated_since;
 
       if (!updatedSince) {
-        throw new Error("updated_since is required");
+        return res.status(400).json({
+          success: false,
+          message: "updated_since is required",
+        });
       }
 
-      const data = await this.service.getUpdatedSince(
-        new Date(String(updatedSince)),
-      );
+      const date = new Date(String(updatedSince));
+
+      if (Number.isNaN(date.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: "updated_since must be a valid date",
+        });
+      }
+
+      const data = await this.service.getUpdatedSince(date);
 
       res.json({
         success: true,

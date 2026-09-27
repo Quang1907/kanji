@@ -4,9 +4,9 @@ import { GrammarService } from "../services/grammar.service";
 export class GrammarController {
   private service = new GrammarService();
 
-  getAll = async (req: Request, res: Response) => {
+  getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { search, lesson } = req.query;
+      const { search, lesson, jlpt_level_id } = req.query;
       let data;
       const page = Number(req.query.page ?? 1);
       const limit = Number(req.query.limit ?? 20);
@@ -15,79 +15,66 @@ export class GrammarController {
         data = await this.service.search(String(search));
       } else if (lesson) {
         data = await this.service.getByLesson(Number(lesson));
+      } else if (jlpt_level_id) {
+        data = await this.service.getByJlpt(Number(jlpt_level_id));
       } else {
         data = await this.service.getAll(page, limit);
       }
-      res.json({
-        success: true,
-        ...data,
-      });
-    } catch {
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch grammar",
-      });
-    }
-  };
-
-  getById = async (req: Request, res: Response) => {
-    try {
-      const data = await this.service.getById(Number(req.params.id));
 
       res.json({
         success: true,
         data,
       });
-    } catch {
-      res.status(404).json({
-        success: false,
-        message: "Grammar not found",
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = await this.service.getById(Number(req.params.id));
+      res.json({
+        success: true,
+        data,
       });
+    } catch (error) {
+      next(error);
     }
   };
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await this.service.create(req.body);
-
       res.status(201).json({
         success: true,
         data,
       });
-    } catch (error: any) {
+    } catch (error) {
       next(error);
     }
   };
 
-  update = async (req: Request, res: Response) => {
+  update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await this.service.update(Number(req.params.id), req.body);
-
       res.json({
         success: true,
         data,
       });
-    } catch (error: any) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
+    } catch (error) {
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response) => {
+  delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       await this.service.delete(Number(req.params.id));
-
       res.json({
         success: true,
         message: "Grammar deleted",
       });
-    } catch (error: any) {
-      res.status(404).json({
-        success: false,
-        message: error.message,
-      });
+    } catch (error) {
+      next(error);
     }
   };
 }

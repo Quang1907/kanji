@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { GrammarController } from "../controllers/gramar.controller";
-import { createGrammarSchema, updateGrammarSchema } from "../dto/gammar.dto";
+import { GrammarController } from "../controllers/grammar.controller";
+import { createGrammarSchema, updateGrammarSchema } from "../dto/grammar.dto";
 import { validate } from "../middleware/validate.middleware";
 
 const router = Router();
-
 const controller = new GrammarController();
+
 router.get("/", controller.getAll);
 router.get("/:id", controller.getById);
 router.post("/", validate(createGrammarSchema), controller.create);

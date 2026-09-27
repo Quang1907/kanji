@@ -3,6 +3,9 @@ import { GrammarRepository } from "../repositories/grammar.repository";
 import { AppError } from "../utils/AppError";
 
 export class GrammarService {
+  getByJlpt(arg0: number): any {
+    throw new Error("Method not implemented.");
+  }
   private repository = new GrammarRepository();
   async getAll(page: number, limit: number) {
     return this.repository.findAll(page, limit);

@@ -1,41 +1,17 @@
-import { useCallback, useState } from "react";
+import { useContext } from "react";
+import {
+  ConfirmContext,
+  type ConfirmContextValue,
+} from "@/components/providers/ConfirmProvider";
 
-interface ConfirmOptions {
-  title: string;
-  description: string;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: "danger" | "warning" | "info" | "success";
+export function useConfirm(): ConfirmContextValue {
+  const context = useContext(ConfirmContext);
+
+  if (!context) {
+    throw new Error("useConfirm must be used inside ConfirmProvider");
+  }
+
+  return context;
 }
 
-interface PendingConfirm {
-  options: ConfirmOptions;
-  resolve: (value: boolean) => void;
-}
-
-export function useConfirm() {
-  const [pending, setPending] = useState<PendingConfirm | null>(null);
-
-  const confirm = useCallback((options: ConfirmOptions): Promise<boolean> => {
-    return new Promise((resolve) => {
-      setPending({ options, resolve });
-    });
-  }, []);
-
-  const handleConfirm = () => {
-    pending?.resolve(true);
-    setPending(null);
-  };
-
-  const handleCancel = () => {
-    pending?.resolve(false);
-    setPending(null);
-  };
-
-  return {
-    confirm,
-    pending,
-    handleConfirm,
-    handleCancel,
-  };
-}
+export default useConfirm;

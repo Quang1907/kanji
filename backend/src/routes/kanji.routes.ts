@@ -12,11 +12,11 @@ const router = Router();
 const controller = new KanjiController();
 
 router.get("/", controller.getAll);
+router.get("/sync", controller.sync);
 router.post("/bulk", validate(createKanjiBulkSchema), controller.createBulk);
 router.post("/", validate(createKanjiSchema), controller.create);
 router.get("/:id", controller.getById);
 router.patch("/:id", validate(updateKanjiSchema), controller.update);
 router.delete("/:id", controller.delete);
-router.get("/sync", controller.sync);
 
 export default router;

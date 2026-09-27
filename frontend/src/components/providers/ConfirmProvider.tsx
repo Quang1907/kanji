@@ -1,16 +1,15 @@
 import {
   createContext,
   useCallback,
-  useContext,
   useState,
   type ReactNode,
 } from "react";
 
 import { ConfirmModal } from "@/components/ui/confirm-modal/ConfirmModal";
 
-type ConfirmVariant = "danger" | "warning" | "info" | "success";
+export type ConfirmVariant = "danger" | "warning" | "info" | "success";
 
-interface ConfirmOptions {
+export interface ConfirmOptions {
   title: string;
   description: string;
   confirmText?: string;
@@ -18,11 +17,11 @@ interface ConfirmOptions {
   variant?: ConfirmVariant;
 }
 
-interface ConfirmContextValue {
+export interface ConfirmContextValue {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
 }
 
-const ConfirmContext = createContext<ConfirmContextValue | null>(null);
+export const ConfirmContext = createContext<ConfirmContextValue | null>(null);
 
 interface PendingConfirm {
   options: ConfirmOptions;
@@ -61,12 +60,4 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useConfirm() {
-  const context = useContext(ConfirmContext);
-
-  if (!context) {
-    throw new Error("useConfirm must be used inside ConfirmProvider");
-  }
-
-  return context;
-}
+export { useConfirm } from "@/hooks/useConfirm";

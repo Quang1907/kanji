@@ -1,10 +1,24 @@
-// import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { startSyncManager } from "./services/sync-manager";
+import { registerSW } from "virtual:pwa-register";
 import "./index.css";
-import App from "./App.tsx";
 
-createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
-  <App />,
-  // </StrictMode>,
+/**
+ * Register PWA.
+ */
+registerSW({
+  immediate: true,
+});
+
+/**
+ * Sync manager.
+ */
+startSyncManager();
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
 );

@@ -14,7 +14,7 @@ export class KanjiService {
     const kanji = await this.repository.findById(id);
 
     if (!kanji) {
-      throw new Error("Kanji not found");
+      throw new AppError("Kanji not found", 404, "KANJI_NOT_FOUND");
     }
 
     return kanji;
@@ -30,52 +30,47 @@ export class KanjiService {
 
   async create(data: Kanji) {
     if (!data.kanji_character?.trim()) {
-      throw new Error("kanji_character is required");
+      throw new AppError("kanji_character is required", 400, "VALIDATION_ERROR");
     }
 
     const exists = await this.repository.findByCharacter(data.kanji_character);
 
     if (exists) {
-      throw new AppError("  s Kanji đã tồn tại", 409, "KANJI_ALREADY_EXISTS");
+      throw new AppError("Kanji đã tồn tại", 409, "KANJI_ALREADY_EXISTS");
     }
 
     const id = await this.repository.create(data);
-
     return this.repository.findById(id);
   }
 
   async createBulk(data: Kanji[]) {
-    // Normalize
     const normalizedData = data.map((kanji) => ({
       ...kanji,
       kanji_character: kanji.kanji_character.trim(),
     }));
-    // Create bulk
+
     const { created, skipped } =
       await this.repository.createBulk(normalizedData);
-    // Build response
+
     return buildBulkResult(
       normalizedData.length,
       created.length,
       skipped.length,
       created,
       skipped,
-      true,
     );
   }
 
   async update(id: number, data: Kanji) {
     await this.getById(id);
-
     await this.repository.update(id, data);
-
     return this.repository.findById(id);
   }
 
   async delete(id: number) {
     await this.getById(id);
-
-    return this.repository.delete(id);
+    await this.repository.delete(id);
+    return true;
   }
 
   async getUpdatedSince(date: Date) {

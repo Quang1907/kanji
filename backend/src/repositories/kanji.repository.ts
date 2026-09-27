@@ -29,7 +29,7 @@ export class KanjiRepository {
 
         LEFT JOIN levels l
           ON l.id = k.jlpt_level_id
-
+          WHERE k.deleted_at IS NULL
         ORDER BY k.id ASC
         `);
 
@@ -79,6 +79,7 @@ export class KanjiRepository {
                 OR meaning LIKE ?
                 OR onyomi LIKE ?
                 OR kunyomi LIKE ?
+            AND deleted_at IS NULL
             ORDER BY id ASC
             `,
       [like, like, like, like, like],
@@ -93,6 +94,7 @@ export class KanjiRepository {
             SELECT *
             FROM kanji
             WHERE jlpt_level_id = ?
+            AND deleted_at IS NULL
             ORDER BY id ASC
             `,
       [jlpt_level_id],
@@ -155,6 +157,7 @@ export class KanjiRepository {
                 mnemonic = ?,
                 stroke_paths = ?
             WHERE id = ?
+            AND deleted_at IS NULL
             `,
       [
         data.kanji_character,

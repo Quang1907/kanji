@@ -7,7 +7,7 @@ interface ConfirmProviderProps {
 }
 
 export function ConfirmProvider({ children }: ConfirmProviderProps) {
-  const { confirm, pending, handleConfirm, handleCancel } = useConfirm();
+  const { pending, handleConfirm, handleCancel } = useConfirm();
 
   return (
     <>
